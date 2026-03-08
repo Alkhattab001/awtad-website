@@ -6,13 +6,16 @@ import PropertyCard from '@/components/properties/PropertyCard';
 import { mockProperties } from '@/services/api';
 import heroImg from '@/assets/hero-main.jpg';
 import property1 from '@/assets/property-1.jpg';
+import type { Easing } from 'framer-motion';
+
+const easeOut: Easing = [0, 0, 0.2, 1];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.6, ease: 'easeOut' },
+    transition: { delay: i * 0.1, duration: 0.6, ease: easeOut },
   }),
 };
 
