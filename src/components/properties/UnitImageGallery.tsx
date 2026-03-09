@@ -23,12 +23,19 @@ const UnitImageGallery = ({ images, alt }: Props) => {
       <div className="flex h-full flex-col bg-muted/30">
         {/* Main Image Area */}
         <div className="relative flex flex-1 items-center justify-center bg-muted/50 p-6 md:p-8">
-          <img
-            src={images[current]}
-            alt={`${alt} - ${current + 1}`}
-            className="max-h-[420px] w-full object-contain md:max-h-[480px]"
-            draggable={false}
-          />
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={current}
+              src={images[current]}
+              alt={`${alt} - ${current + 1}`}
+              className="max-h-[420px] w-full object-contain md:max-h-[480px]"
+              draggable={false}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.35, ease: 'easeInOut' }}
+            />
+          </AnimatePresence>
 
           {/* Prev/Next Controls */}
           {hasMultiple && (

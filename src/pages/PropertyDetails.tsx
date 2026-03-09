@@ -3,7 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
 import { getPropertyBySlug, getUnitsByProperty } from '@/services/api';
 import UnitStyleCard from '@/components/properties/UnitStyleCard';
+import UnitFilters from '@/components/properties/UnitFilters';
 import InterestForm from '@/components/shared/InterestForm';
+import ScrollReveal from '@/components/shared/ScrollReveal';
 import type { Property, Unit } from '@/types';
 import { MapPin, Building2, Calendar, ArrowLeft, X, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,6 +15,7 @@ const PropertyDetails = () => {
   const { t, language } = useLanguage();
   const [property, setProperty] = useState<Property | null>(null);
   const [units, setUnits] = useState<Unit[]>([]);
+  const [filteredUnits, setFilteredUnits] = useState<Unit[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -26,6 +29,7 @@ const PropertyDetails = () => {
         setProperty(p);
         const u = await getUnitsByProperty(p.id);
         setUnits(u);
+        setFilteredUnits(u);
       }
       setLoading(false);
     });
@@ -65,11 +69,15 @@ const PropertyDetails = () => {
   return (
     <>
       {/* Hero Gallery */}
-      <section className="relative h-[60vh] min-h-[400px]">
-        <img
+      <section className="relative h-[60vh] min-h-[400px] overflow-hidden">
+        <motion.img
+          key={galleryIndex}
           src={property.gallery_images[galleryIndex] || property.cover_image}
           alt={name}
           className="h-full w-full object-cover"
+          initial={{ scale: 1.05, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: [0, 0, 0.2, 1] }}
         />
         <div className="bg-overlay-dark absolute inset-0" />
         <div className="absolute bottom-0 left-0 right-0 p-8">
@@ -88,7 +96,6 @@ const PropertyDetails = () => {
             </div>
           </div>
         </div>
-        {/* Gallery dots */}
         {property.gallery_images.length > 1 && (
           <div className="absolute bottom-4 right-8 flex gap-2 rtl:left-8 rtl:right-auto">
             {property.gallery_images.map((_, i) => (
@@ -105,11 +112,10 @@ const PropertyDetails = () => {
       {/* Overview */}
       <section className="section-padding">
         <div className="container-premium grid gap-12 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <ScrollReveal className="lg:col-span-2">
             <h2 className="font-display text-2xl font-bold text-foreground mb-4">{t('Project Overview', 'نظرة عامة')}</h2>
             <p className="font-body text-base leading-relaxed text-muted-foreground">{desc}</p>
 
-            {/* Amenities */}
             <h3 className="font-display text-xl font-semibold text-foreground mt-10 mb-4">{t('Amenities & Features', 'المرافق والمميزات')}</h3>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
               {[...property.amenities, ...property.features].map((item, i) => (
@@ -118,10 +124,9 @@ const PropertyDetails = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </ScrollReveal>
 
-          {/* Sidebar CTA */}
-          <div className="lg:col-span-1">
+          <ScrollReveal delay={0.2} className="lg:col-span-1">
             <div className="sticky top-28 rounded-lg border border-border bg-card p-6 shadow-sm">
               <h3 className="font-display text-lg font-semibold text-foreground mb-2">{t('Interested in this project?', 'مهتم بهذا المشروع؟')}</h3>
               <p className="font-body text-sm text-muted-foreground mb-4">{property.availability_summary}</p>
@@ -138,7 +143,7 @@ const PropertyDetails = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -146,8 +151,7 @@ const PropertyDetails = () => {
       {units.length > 0 && (
         <section className="py-24 md:py-32 bg-secondary">
           <div className="container-premium">
-            {/* Section header */}
-            <div className="mb-16 max-w-2xl">
+            <ScrollReveal className="mb-16 max-w-2xl">
               <div className="mb-4 h-px w-16 bg-gradient-gold" />
               <p className="mb-3 font-body text-xs font-bold uppercase tracking-[0.25em] text-primary">
                 {t('Unit Catalogue', 'كتالوج الوحدات')}
@@ -161,11 +165,25 @@ const PropertyDetails = () => {
                   'تصفح أنماط الوحدات المصممة بعناية، كل منها مُعد لتقديم أرقى تجربة معيشية.'
                 )}
               </p>
-            </div>
+            </ScrollReveal>
+
+            {/* Filters */}
+            <UnitFilters units={units} onFilter={setFilteredUnits} />
+
             <div className="space-y-12">
-              {units.map((unit, i) => (
-                <UnitStyleCard key={unit.id} unit={unit} onInterest={handleUnitInterest} index={i} />
-              ))}
+              {filteredUnits.length === 0 ? (
+                <div className="py-16 text-center">
+                  <p className="font-body text-lg text-muted-foreground">
+                    {t('No units match your filters.', 'لا توجد وحدات مطابقة للتصفية.')}
+                  </p>
+                </div>
+              ) : (
+                filteredUnits.map((unit, i) => (
+                  <ScrollReveal key={unit.id} delay={i * 0.08}>
+                    <UnitStyleCard unit={unit} onInterest={handleUnitInterest} index={i} />
+                  </ScrollReveal>
+                ))
+              )}
             </div>
           </div>
         </section>
