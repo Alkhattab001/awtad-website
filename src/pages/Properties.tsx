@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import PropertyCard from '@/components/properties/PropertyCard';
+import ScrollReveal from '@/components/shared/ScrollReveal';
 import { getProperties } from '@/services/api';
 import type { Property } from '@/types';
 import { Search, SlidersHorizontal } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Properties = () => {
   const { t, language } = useLanguage();
@@ -42,12 +44,22 @@ const Properties = () => {
       {/* Header */}
       <section className="bg-accent py-20">
         <div className="container-premium text-center">
-          <p className="mb-2 font-body text-sm font-semibold uppercase tracking-[0.2em] text-gold">
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-2 font-body text-sm font-semibold uppercase tracking-[0.2em] text-gold"
+          >
             {t('Our Portfolio', 'مشاريعنا')}
-          </p>
-          <h1 className="font-display text-4xl font-bold text-accent-foreground md:text-5xl">
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="font-display text-4xl font-bold text-accent-foreground md:text-5xl"
+          >
             {t('Properties & Projects', 'العقارات والمشاريع')}
-          </h1>
+          </motion.h1>
         </div>
       </section>
 
@@ -125,8 +137,10 @@ const Properties = () => {
             </div>
           ) : (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((p) => (
-                <PropertyCard key={p.id} property={p} />
+              {filtered.map((p, i) => (
+                <ScrollReveal key={p.id} delay={i * 0.08}>
+                  <PropertyCard property={p} />
+                </ScrollReveal>
               ))}
             </div>
           )}

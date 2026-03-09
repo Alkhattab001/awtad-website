@@ -30,13 +30,13 @@ const PropertyCard = ({ property }: Props) => {
 
   return (
     <Link to={`/properties/${property.slug}`} className="group block">
-      <div className="card-premium overflow-hidden">
+      <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all duration-500 group-hover:shadow-xl group-hover:-translate-y-2">
         {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden">
           <img
             src={property.cover_image}
             alt={name}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           <div className="absolute top-4 left-4">
             <span className={`rounded-full px-3 py-1 font-body text-xs font-semibold ${statusColors[property.status]}`}>

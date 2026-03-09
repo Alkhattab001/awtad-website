@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Building2, Users, Award, MapPin, Shield, TrendingUp, Gem, ChevronRight, Phone } from 'lucide-react';
 import PropertyCard from '@/components/properties/PropertyCard';
+import ScrollReveal from '@/components/shared/ScrollReveal';
+import AnimatedCounter from '@/components/shared/AnimatedCounter';
 import { mockProperties } from '@/services/api';
 import heroImg from '@/assets/hero-main.jpg';
 import property1 from '@/assets/property-1.jpg';
@@ -28,7 +30,7 @@ const Index = () => {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   const stats = [
-    { value: '15+', label: t('Years of Excellence', 'عاماً من التميز'), suffix: '' },
+    { value: '15', label: t('Years of Excellence', 'عاماً من التميز'), suffix: '+' },
     { value: '3,200', label: t('Units Delivered', 'وحدة تم تسليمها'), suffix: '+' },
     { value: '12', label: t('Active Projects', 'مشروع نشط'), suffix: '' },
     { value: '98', label: t('Client Satisfaction', 'رضا العملاء'), suffix: '%' },
@@ -57,21 +59,14 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/50 to-transparent" />
         <div className="absolute inset-0 bg-charcoal/20" />
         <motion.div className="container-premium relative z-10" style={{ opacity: heroOpacity }}>
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            className="max-w-3xl"
-          >
-            {/* Thin gold accent line */}
+          <motion.div initial="hidden" animate="visible" className="max-w-3xl">
             <motion.div variants={fadeUp} custom={0} className="mb-8 h-px w-16 bg-gradient-gold" />
             <motion.p variants={fadeUp} custom={0} className="mb-5 font-body text-xs font-semibold uppercase tracking-[0.35em] text-gold-light">
               {t('Defining Luxury Living in Oman', 'نعيد تعريف الحياة الفاخرة في عُمان')}
             </motion.p>
             <motion.h1 variants={fadeUp} custom={1} className="font-display text-5xl font-bold leading-[1.1] text-cream md:text-7xl lg:text-8xl">
-              {t('Building', 'نبني')}
-              <br />
-              <span className="text-gradient-gold">{t('Landmarks', 'معالم')}</span>
-              <br />
+              {t('Building', 'نبني')}<br />
+              <span className="text-gradient-gold">{t('Landmarks', 'معالم')}</span><br />
               {t('of Tomorrow', 'الغد')}
             </motion.h1>
             <motion.p variants={fadeUp} custom={2} className="mt-7 max-w-xl font-body text-base leading-relaxed text-cream/70 md:text-lg">
@@ -92,8 +87,6 @@ const Index = () => {
             </motion.div>
           </motion.div>
         </motion.div>
-
-        {/* Scroll indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2"
           animate={{ y: [0, 8, 0] }}
@@ -106,26 +99,26 @@ const Index = () => {
       {/* ─── FEATURED PROJECTS ─── */}
       <section className="section-padding bg-background">
         <div className="container-premium">
-          <div className="mb-14 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <ScrollReveal className="mb-14 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="mb-4 h-px w-12 bg-gradient-gold" />
               <p className="mb-3 font-body text-xs font-semibold uppercase tracking-[0.3em] text-primary">
                 {t('Featured Projects', 'المشاريع المميزة')}
               </p>
               <h2 className="font-display text-3xl font-bold text-foreground md:text-5xl">
-                {t('Our Latest', 'أحدث')}
-                <br className="hidden md:block" />
-                {t(' Developments', ' مشاريعنا')}
+                {t('Our Latest', 'أحدث')}<br className="hidden md:block" />{t(' Developments', ' مشاريعنا')}
               </h2>
             </div>
             <Link to="/properties" className="group hidden items-center gap-2 font-body text-sm font-medium text-primary hover:text-gold-dark md:flex">
               {t('View All Projects', 'عرض كل المشاريع')}
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
             </Link>
-          </div>
+          </ScrollReveal>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {mockProperties.map((p) => (
-              <PropertyCard key={p.id} property={p} />
+            {mockProperties.map((p, i) => (
+              <ScrollReveal key={p.id} delay={i * 0.1}>
+                <PropertyCard property={p} />
+              </ScrollReveal>
             ))}
           </div>
           <div className="mt-10 text-center md:hidden">
@@ -143,20 +136,13 @@ const Index = () => {
         <div className="container-premium relative py-20 md:py-24">
           <div className="grid grid-cols-2 gap-y-12 gap-x-8 md:grid-cols-4">
             {stats.map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ delay: i * 0.12, duration: 0.6 }}
-                className="text-center"
-              >
+              <ScrollReveal key={i} delay={i * 0.12} className="text-center">
                 <p className="font-display text-5xl font-bold text-gradient-gold md:text-6xl">
-                  {stat.value}<span className="text-gold-light">{stat.suffix}</span>
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} suffixClassName="text-gold-light" />
                 </p>
                 <div className="mx-auto mt-3 mb-3 h-px w-8 bg-gold/30" />
                 <p className="font-body text-sm text-accent-foreground/70 tracking-wide">{stat.label}</p>
-              </motion.div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -165,12 +151,7 @@ const Index = () => {
       {/* ─── COMPANY INTRO ─── */}
       <section className="section-padding bg-background">
         <div className="container-premium grid gap-16 md:grid-cols-2 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
+          <ScrollReveal direction="left">
             <div className="mb-4 h-px w-12 bg-gradient-gold" />
             <p className="mb-3 font-body text-xs font-semibold uppercase tracking-[0.3em] text-primary">
               {t('About Awtad', 'عن أوتاد')}
@@ -194,17 +175,10 @@ const Index = () => {
               {t('Discover Our Story', 'اكتشف قصتنا')}
               <ChevronRight size={16} className="transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
             </Link>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="relative"
-          >
+          </ScrollReveal>
+          <ScrollReveal direction="right" delay={0.2} className="relative">
             <div className="relative overflow-hidden rounded-sm">
               <img src={property1} alt="About Awtad" className="w-full aspect-[4/5] object-cover" />
-              {/* Overlay accent block */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-charcoal/80 to-transparent p-8 pt-20">
                 <div className="flex items-end gap-6">
                   <div>
@@ -219,14 +193,14 @@ const Index = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* ─── WHY CHOOSE US ─── */}
       <section className="section-padding bg-secondary">
         <div className="container-premium">
-          <div className="mb-14 max-w-2xl">
+          <ScrollReveal className="mb-14 max-w-2xl">
             <div className="mb-4 h-px w-12 bg-gradient-gold" />
             <p className="mb-3 font-body text-xs font-semibold uppercase tracking-[0.3em] text-primary">
               {t('Why Awtad', 'لماذا أوتاد')}
@@ -234,23 +208,18 @@ const Index = () => {
             <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
               {t('Built on Values That Endure', 'مبنية على قيم دائمة')}
             </h2>
-          </div>
+          </ScrollReveal>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {values.map((v, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-30px' }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="group rounded-sm border border-border bg-card p-8 transition-all duration-300 hover:border-primary/30 hover:shadow-xl"
-              >
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                  {v.icon}
+              <ScrollReveal key={i} delay={i * 0.1}>
+                <div className="group rounded-sm border border-border bg-card p-8 transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:-translate-y-1">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-sm bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    {v.icon}
+                  </div>
+                  <h3 className="font-display text-lg font-semibold text-foreground mb-3">{v.title}</h3>
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
                 </div>
-                <h3 className="font-display text-lg font-semibold text-foreground mb-3">{v.title}</h3>
-                <p className="font-body text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
-              </motion.div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -259,7 +228,7 @@ const Index = () => {
       {/* ─── LATEST INSIGHTS ─── */}
       <section className="section-padding bg-background">
         <div className="container-premium">
-          <div className="mb-14 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <ScrollReveal className="mb-14 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="mb-4 h-px w-12 bg-gradient-gold" />
               <p className="mb-3 font-body text-xs font-semibold uppercase tracking-[0.3em] text-primary">
@@ -269,29 +238,24 @@ const Index = () => {
                 {t('Latest Articles', 'آخر المقالات')}
               </h2>
             </div>
-          </div>
+          </ScrollReveal>
           <div className="grid gap-8 md:grid-cols-3">
             {articles.map((a, i) => (
-              <motion.article
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12 }}
-                className="group cursor-pointer"
-              >
-                <div className="relative aspect-[16/10] overflow-hidden rounded-sm mb-5">
-                  <img src={a.image} alt={a.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-charcoal/0 transition-colors group-hover:bg-charcoal/10" />
-                </div>
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="font-body text-xs font-semibold uppercase tracking-wider text-primary">{a.cat}</span>
-                  <span className="h-1 w-1 rounded-full bg-border" />
-                  <span className="font-body text-xs text-muted-foreground">{a.date}</span>
-                </div>
-                <h3 className="font-display text-xl font-semibold text-foreground leading-snug mb-2 group-hover:text-primary transition-colors">{a.title}</h3>
-                <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-2">{a.excerpt}</p>
-              </motion.article>
+              <ScrollReveal key={i} delay={i * 0.12}>
+                <article className="group cursor-pointer">
+                  <div className="relative aspect-[16/10] overflow-hidden rounded-sm mb-5">
+                    <img src={a.image} alt={a.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-charcoal/0 transition-colors group-hover:bg-charcoal/10" />
+                  </div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="font-body text-xs font-semibold uppercase tracking-wider text-primary">{a.cat}</span>
+                    <span className="h-1 w-1 rounded-full bg-border" />
+                    <span className="font-body text-xs text-muted-foreground">{a.date}</span>
+                  </div>
+                  <h3 className="font-display text-xl font-semibold text-foreground leading-snug mb-2 group-hover:text-primary transition-colors">{a.title}</h3>
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-2">{a.excerpt}</p>
+                </article>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -304,16 +268,10 @@ const Index = () => {
           <div className="absolute inset-0 bg-charcoal/75" />
         </div>
         <div className="container-premium relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
+          <ScrollReveal>
             <div className="mx-auto mb-6 h-px w-16 bg-gradient-gold" />
             <h2 className="font-display text-4xl font-bold text-cream md:text-6xl mb-6 leading-tight">
-              {t('Your Future Home', 'منزلك المستقبلي')}
-              <br />
+              {t('Your Future Home', 'منزلك المستقبلي')}<br />
               <span className="text-gradient-gold">{t('Awaits', 'بانتظارك')}</span>
             </h2>
             <p className="mx-auto max-w-lg font-body text-base text-cream/60 mb-10 leading-relaxed">
@@ -331,7 +289,7 @@ const Index = () => {
                 {t('Browse Projects', 'تصفح المشاريع')}
               </Link>
             </div>
-          </motion.div>
+          </ScrollReveal>
         </div>
       </section>
     </>

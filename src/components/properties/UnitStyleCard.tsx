@@ -46,7 +46,7 @@ const UnitStyleCard = ({ unit, onInterest, index }: Props) => {
     <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
       <div className={`grid md:grid-cols-2 ${isEven ? 'md:direction-rtl' : ''}`}>
         {/* ── Image Panel ── */}
-        <div className="relative min-h-[340px] md:min-h-[520px]">
+        <div className="group/img relative min-h-[340px] md:min-h-[520px] overflow-hidden">
           <UnitImageGallery
             images={unit.gallery_images?.length ? unit.gallery_images : [unit.brochure_image]}
             alt={title}
