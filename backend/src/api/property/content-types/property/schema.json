@@ -1,0 +1,92 @@
+{
+  "kind": "collectionType",
+  "collectionName": "properties",
+  "info": {
+    "singularName": "property",
+    "pluralName": "properties",
+    "displayName": "Property",
+    "description": "Individual properties within buildings"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "name_ar": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "description_ar": {
+      "type": "text"
+    },
+    "price": {
+      "type": "decimal"
+    },
+    "area": {
+      "type": "decimal"
+    },
+    "bedrooms": {
+      "type": "integer"
+    },
+    "bathrooms": {
+      "type": "integer"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["available", "reserved", "sold"],
+      "default": "available"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["apartment", "villa", "penthouse", "studio", "townhouse", "commercial"],
+      "required": true
+    },
+    "floor": {
+      "type": "integer"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "gallery": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "floorplan": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "amenities": {
+      "type": "json"
+    },
+    "building": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::building.building",
+      "inversedBy": "properties"
+    },
+    "units": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::unit.unit",
+      "mappedBy": "property"
+    }
+  }
+}

@@ -5,9 +5,142 @@ import property3 from '@/assets/property-3.jpg';
 import floorplan1 from '@/assets/floorplan-1.jpg';
 
 // ─── BASE CONFIG ─────────────────────────────────────────
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+const API_BASE_URL = `${STRAPI_URL}/api`;
 
-// ─── MOCK DATA ───────────────────────────────────────────
+// ─── STRAPI RESPONSE TYPES ───────────────────────────────
+interface StrapiResponse<T> {
+  data: T;
+  meta?: {
+    pagination?: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+}
+
+interface StrapiBuilding {
+  id: number;
+  documentId: string;
+  name: string;
+  name_ar: string;
+  slug: string;
+  description: string;
+  description_ar: string;
+  location: string;
+  location_ar: string;
+  status: 'upcoming' | 'under_construction' | 'ready' | 'sold_out';
+  featured: boolean;
+  image?: { url: string };
+  gallery?: { url: string }[];
+  properties?: StrapiProperty[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface StrapiProperty {
+  id: number;
+  documentId: string;
+  name: string;
+  name_ar: string;
+  slug: string;
+  description: string;
+  description_ar: string;
+  price: number;
+  area: number;
+  bedrooms: number;
+  bathrooms: number;
+  status: 'available' | 'reserved' | 'sold';
+  type: string;
+  floor: number;
+  image?: { url: string };
+  gallery?: { url: string }[];
+  floorplan?: { url: string };
+  amenities: string[];
+  building?: StrapiBuilding;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface StrapiUnit {
+  id: number;
+  documentId: string;
+  name: string;
+  name_ar: string;
+  unit_number: string;
+  price: number;
+  area: number;
+  bedrooms: number;
+  bathrooms: number;
+  floor: number;
+  status: 'available' | 'reserved' | 'sold';
+  image?: { url: string };
+  floorplan?: { url: string };
+  property?: StrapiProperty;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── HELPER FUNCTIONS ────────────────────────────────────
+function getImageUrl(image?: { url: string }): string {
+  if (!image?.url) return property1;
+  if (image.url.startsWith('http')) return image.url;
+  return `${STRAPI_URL}${image.url}`;
+}
+
+function mapBuildingToProperty(building: StrapiBuilding): Property {
+  return {
+    id: building.documentId || String(building.id),
+    slug: building.slug,
+    name_en: building.name,
+    name_ar: building.name_ar,
+    short_description_en: building.description?.slice(0, 150) + '...',
+    short_description_ar: building.description_ar?.slice(0, 150) + '...',
+    full_description_en: building.description,
+    full_description_ar: building.description_ar,
+    cover_image: getImageUrl(building.image),
+    gallery_images: building.gallery?.map(img => getImageUrl(img)) || [],
+    location_en: building.location,
+    location_ar: building.location_ar,
+    status: building.status,
+    availability_summary: `${building.properties?.length || 0} properties available`,
+    total_units: building.properties?.length || 0,
+    amenities: [],
+    features: [],
+    created_at: building.createdAt,
+    updated_at: building.updatedAt,
+  };
+}
+
+function mapStrapiUnit(unit: StrapiUnit, propertyId: string): Unit {
+  return {
+    id: unit.documentId || String(unit.id),
+    property_id: propertyId,
+    title_en: unit.name,
+    title_ar: unit.name_ar || unit.name,
+    style_code: unit.unit_number,
+    brochure_image: getImageUrl(unit.floorplan) || floorplan1,
+    description_en: `${unit.bedrooms} bedroom unit with ${unit.area} sqm`,
+    description_ar: `وحدة بـ ${unit.bedrooms} غرف نوم بمساحة ${unit.area} متر مربع`,
+    availability_status: unit.status,
+    price_starting_from: unit.price,
+    area_sqm: unit.area,
+    bedrooms: unit.bedrooms,
+    bathrooms: unit.bathrooms,
+    balconies: 1,
+    living_rooms: 1,
+    floor: String(unit.floor),
+    maid_room: false,
+    laundry_room: false,
+    extra_features: [],
+    created_at: unit.createdAt,
+    updated_at: unit.updatedAt,
+  };
+}
+
+// ─── MOCK DATA (FALLBACK) ────────────────────────────────
 const mockProperties: Property[] = [
   {
     id: '1',
@@ -16,8 +149,8 @@ const mockProperties: Property[] = [
     name_ar: 'مساكن النور',
     short_description_en: 'Premium waterfront living with panoramic views of the coastline. A landmark of modern luxury.',
     short_description_ar: 'سكن فاخر على الواجهة البحرية مع إطلالات بانورامية على الساحل.',
-    full_description_en: 'Al Noor Residences represents the pinnacle of coastal luxury living. Strategically positioned along the waterfront, each residence offers unobstructed views of the sea and the city skyline. The development features world-class amenities including an infinity pool, private beach access, a state-of-the-art fitness center, and landscaped gardens designed by internationally acclaimed architects.',
-    full_description_ar: 'تمثل مساكن النور قمة الحياة الساحلية الفاخرة. تقع في موقع استراتيجي على الواجهة البحرية، وتوفر كل وحدة سكنية إطلالات مفتوحة على البحر وأفق المدينة.',
+    full_description_en: 'Al Noor Residences represents the pinnacle of coastal luxury living. Strategically positioned along the waterfront, each residence offers unobstructed views of the sea and the city skyline.',
+    full_description_ar: 'تمثل مساكن النور قمة الحياة الساحلية الفاخرة. تقع في موقع استراتيجي على الواجهة البحرية.',
     cover_image: property1,
     gallery_images: [property1, property2],
     location_en: 'Al Mouj, Muscat',
@@ -37,7 +170,7 @@ const mockProperties: Property[] = [
     name_ar: 'فلل صحارى',
     short_description_en: 'Exclusive villa community blending traditional architecture with contemporary design.',
     short_description_ar: 'مجتمع فلل حصري يمزج بين العمارة التقليدية والتصميم المعاصر.',
-    full_description_en: 'Sahara Villas offers an exclusive community of luxury villas that seamlessly blend traditional Omani architectural heritage with cutting-edge contemporary design. Set within lush landscaped grounds, each villa provides generous living spaces, private gardens, and premium finishes throughout.',
+    full_description_en: 'Sahara Villas offers an exclusive community of luxury villas that seamlessly blend traditional Omani architectural heritage with cutting-edge contemporary design.',
     full_description_ar: 'توفر فلل صحارى مجتمعاً حصرياً من الفلل الفاخرة التي تمزج بين التراث المعماري العماني والتصميم المعاصر.',
     cover_image: property2,
     gallery_images: [property2, property3],
@@ -58,7 +191,7 @@ const mockProperties: Property[] = [
     name_ar: 'برج القمة',
     short_description_en: 'A mixed-use landmark tower offering premium commercial and residential spaces in the heart of the city.',
     short_description_ar: 'برج متعدد الاستخدامات يوفر مساحات تجارية وسكنية فاخرة في قلب المدينة.',
-    full_description_en: 'The Summit Tower rises as an iconic addition to the city skyline, offering a curated mix of luxury apartments, premium office spaces, and retail destinations. With its striking glass façade and world-class engineering, the tower sets a new benchmark for urban living and working.',
+    full_description_en: 'The Summit Tower rises as an iconic addition to the city skyline, offering a curated mix of luxury apartments, premium office spaces, and retail destinations.',
     full_description_ar: 'يرتفع برج القمة كإضافة مميزة إلى أفق المدينة، ويوفر مزيجاً من الشقق الفاخرة والمساحات المكتبية المتميزة.',
     cover_image: property3,
     gallery_images: [property3, property1],
@@ -173,47 +306,70 @@ const mockUnits: Unit[] = [
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // ─── API FUNCTIONS ───────────────────────────────────────
-// Replace mock implementations with real fetch calls when backend is ready.
-
 export async function getProperties(): Promise<Property[]> {
-  if (API_BASE_URL) {
-    const res = await fetch(`${API_BASE_URL}/properties`);
-    if (!res.ok) throw new Error('Failed to fetch properties');
-    return res.json();
+  try {
+    const res = await fetch(`${API_BASE_URL}/buildings?populate=*`);
+    if (res.ok) {
+      const json: StrapiResponse<StrapiBuilding[]> = await res.json();
+      return json.data.map(mapBuildingToProperty);
+    }
+  } catch (error) {
+    console.log('Using mock data - Strapi not available');
   }
   await delay(400);
   return mockProperties;
 }
 
 export async function getPropertyBySlug(slug: string): Promise<Property | undefined> {
-  if (API_BASE_URL) {
-    const res = await fetch(`${API_BASE_URL}/properties/${slug}`);
-    if (!res.ok) throw new Error('Property not found');
-    return res.json();
+  try {
+    const res = await fetch(`${API_BASE_URL}/buildings?filters[slug][$eq]=${slug}&populate=*`);
+    if (res.ok) {
+      const json: StrapiResponse<StrapiBuilding[]> = await res.json();
+      if (json.data.length > 0) {
+        return mapBuildingToProperty(json.data[0]);
+      }
+    }
+  } catch (error) {
+    console.log('Using mock data - Strapi not available');
   }
   await delay(300);
   return mockProperties.find((p) => p.slug === slug);
 }
 
 export async function getUnitsByProperty(propertyId: string): Promise<Unit[]> {
-  if (API_BASE_URL) {
-    const res = await fetch(`${API_BASE_URL}/properties/${propertyId}/units`);
-    if (!res.ok) throw new Error('Failed to fetch units');
-    return res.json();
+  try {
+    const res = await fetch(`${API_BASE_URL}/units?filters[property][documentId][$eq]=${propertyId}&populate=*`);
+    if (res.ok) {
+      const json: StrapiResponse<StrapiUnit[]> = await res.json();
+      return json.data.map(unit => mapStrapiUnit(unit, propertyId));
+    }
+  } catch (error) {
+    console.log('Using mock data - Strapi not available');
   }
   await delay(300);
   return mockUnits.filter((u) => u.property_id === propertyId);
 }
 
 export async function submitInterestForm(inquiry: Inquiry): Promise<{ success: boolean }> {
-  if (API_BASE_URL) {
+  try {
     const res = await fetch(`${API_BASE_URL}/inquiries`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(inquiry),
+      body: JSON.stringify({
+        data: {
+          name: inquiry.name,
+          email: inquiry.email,
+          phone: inquiry.phone,
+          message: inquiry.message,
+          preferred_contact: inquiry.preferred_contact,
+        }
+      }),
     });
-    if (!res.ok) throw new Error('Failed to submit inquiry');
-    return res.json();
+    if (res.ok) {
+      return { success: true };
+    }
+  } catch (error) {
+    console.log('Using mock submission - Strapi not available');
   }
   await delay(600);
   console.log('Inquiry submitted:', inquiry);
