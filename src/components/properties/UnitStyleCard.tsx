@@ -1,6 +1,7 @@
 import { useLanguage } from '@/context/LanguageContext';
 import { BedDouble, Bath, Maximize, Building2, Check, X, Gem, Waves } from 'lucide-react';
 import type { Unit } from '@/types';
+import UnitImageGallery from './UnitImageGallery';
 
 interface Props {
   unit: Unit;
